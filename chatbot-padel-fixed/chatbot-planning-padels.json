@@ -1,0 +1,85 @@
+{
+  "name": "Chatbot Planning Padel",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "chat",
+        "method": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "Webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node /chemin/vers/scrape-heitzfit.js"
+      },
+      "id": "ExecuteCommand",
+      "name": "Run Puppeteer Script",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const data = JSON.parse($node[\"Run Puppeteer Script\"].json[\"stdout\"]);\nlet result = \"\ud83c\udfbe Cr\u00e9neaux libres :\\n\";\ndata.forEach(slot => {\n  result += `\ud83d\udd52 ${slot.time} \u2013 ${slot.name} \u2013 ${slot.location}\\n`;\n});\nreturn [{ json: { reply: result } }];"
+      },
+      "id": "FormatOutput",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "responseData": "={{$json[\"reply\"]}}",
+        "responseCode": 200
+      },
+      "id": "SendResponse",
+      "name": "Send Chat Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          "Run Puppeteer Script"
+        ]
+      ]
+    },
+    "Run Puppeteer Script": {
+      "main": [
+        [
+          "Format Response"
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          "Send Chat Response"
+        ]
+      ]
+    }
+  },
+  "active": false
+}

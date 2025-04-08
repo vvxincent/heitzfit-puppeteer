@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Padel</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f0f0f0; }
+    #response { margin-top: 1em; background: #fff; padding: 1em; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Chatbot Planning Padel 🎾</h2>
+  <input type="text" id="message" placeholder="Tapez votre message..." style="width: 300px;" />
+  <button onclick="sendMessage()">Envoyer</button>
+  <div id="response"></div>
+
+  <script>
+    async function sendMessage() {
+      const msg = document.getElementById("message").value;
+      const res = await fetch("https://votre-instance-n8n.n8n.cloud/webhook/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await res.text();
+      document.getElementById("response").innerText = data;
+    }
+  </script>
+</body>
+</html>
